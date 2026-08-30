@@ -1,0 +1,18 @@
+{
+  "name": "atlas-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Minimal backend proxy that holds Atlas sandbox credentials and forwards search.do calls, since the browser cannot call Atlas directly.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5"
+  }
+}

@@ -1,0 +1,15 @@
+# Environment files with real credentials — never commit these
+.env
+.env.local
+atlas-proxy/.env
+
+# Dependencies
+node_modules/
+
+# OS clutter
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+*.log

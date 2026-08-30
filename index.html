@@ -1,0 +1,1883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bird</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CjxjaXJjbGUgY3g9IjMwIiBjeT0iMzYiIHI9IjIwIiBmaWxsPSIjMUQ2QjVFIi8+CjxwYXRoIGQ9Ik00NiAzMCBMNTggMjUgTDQ4IDM3IFoiIGZpbGw9IiNCNDU1MkEiLz4KPGNpcmNsZSBjeD0iMjIiIGN5PSIzMCIgcj0iMy41IiBmaWxsPSIjMTYxMzExIi8+CjxwYXRoIGQ9Ik0yMC41IDI3IEwyMiAyMy41IEwyMy41IDI3IFoiIGZpbGw9IiNGRkZGRkYiLz4KPC9zdmc+">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F4EE;
+    --surface: #FFFFFF;
+    --border: #E4DFD2;
+    --text: #2B2621;
+    --text-muted: #766F63;
+    --them: #1D6B5E;
+    --them-light: #E4F1EC;
+    --them-dark: #123F37;
+    --you: #B4552A;
+    --you-light: #FBEBDF;
+    --you-dark: #7A3A1B;
+    --danger: #B3261E;
+    --danger-light: #FBEAE9;
+    --admin: #9A6B12;
+    --admin-light: #FBF1DD;
+    --radius: 20px;
+    --radius-sm: 12px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app { max-width: 640px; margin: 0 auto; padding: 24px 20px 100px; }
+  h1 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 28px; margin: 0 0 4px; color: var(--them-dark); }
+  h2 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 22px; margin: 0 0 4px; color: var(--them-dark); }
+  .tab-panel { display: none; }
+  .tab-panel.visible { display: block; }
+  .sub-view { display: none; }
+  .sub-view.visible { display: block; }
+  button { font-family: 'Inter', sans-serif; }
+
+  .tab-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    display: flex; justify-content: center; z-index: 10;
+  }
+  .tab-bar-inner { max-width: 640px; width: 100%; display: flex; }
+  .tab-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 10px 4px 12px; border: none; background: none; cursor: pointer;
+    color: var(--text-muted); font-size: 12px; font-weight: 600;
+  }
+  .tab-btn svg { width: 23px; height: 23px; }
+  .tab-btn.active { color: var(--them); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+  .pill-btn { font-size: 16px; font-weight: 600; padding: 13px 20px; border-radius: 999px; border: none; cursor: pointer; }
+  .pill-btn.primary { background: var(--them); color: white; }
+  .pill-btn.secondary { background: var(--you); color: white; }
+  .pill-btn.ghost { background: var(--bg); color: var(--text); border: 1.5px solid var(--border); }
+  .pill-btn.danger { background: var(--danger); color: white; }
+  .pill-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px; color: var(--text-muted);
+    font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 16px; background: none; border: none; padding: 0;
+  }
+  .back-link svg { width: 18px; height: 18px; }
+  .field-label { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; display: block; margin-bottom: 6px; }
+  select, input[type="text"], input[type="date"] {
+    font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 500;
+    padding: 11px 12px; border-radius: var(--radius-sm); border: 1.5px solid var(--border);
+    background: var(--bg); color: var(--text); width: 100%;
+  }
+  select:focus-visible, input:focus-visible, textarea:focus-visible, button:focus-visible { outline: 3px solid #378ADD; outline-offset: 2px; }
+  .status-badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.03em; display: inline-block; }
+  .status-badge.them { background: var(--them-light); color: var(--them-dark); }
+  .status-badge.admin { background: var(--admin-light); color: var(--admin); }
+  .status-badge.danger { background: var(--danger-light); color: var(--danger); }
+  .toast-note { background: var(--them-light); color: var(--them-dark); border-radius: var(--radius-sm); padding: 12px 16px; font-size: 14px; font-weight: 600; margin-bottom: 16px; display: none; text-align: center; }
+  .toast-note.show { display: block; }
+
+  /* ---------- Tab 1: Plan feed ---------- */
+  .feed-post { padding: 0; overflow: hidden; }
+  .feed-post-header { display: flex; align-items: center; gap: 10px; padding: 16px 16px 12px; }
+  .avatar-circle { width: 40px; height: 40px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: var(--border); }
+  .avatar-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .feed-post-header .name { font-weight: 600; font-size: 15px; margin: 0; }
+  .feed-post-header .meta { font-size: 13px; color: var(--text-muted); margin: 0; }
+  .photo-wrap { position: relative; width: 100%; height: 200px; overflow: hidden; background: var(--border); }
+  .photo-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-badge {
+    position: absolute; left: 12px; bottom: 12px; display: flex; align-items: center; gap: 6px;
+    background: rgba(20,20,18,0.55); color: #FFFFFF; font-size: 13px; font-weight: 600;
+    padding: 6px 12px; border-radius: 999px;
+  }
+  .photo-badge svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .photo-credit { font-size: 11px; color: var(--text-muted); padding: 6px 16px 0; text-align: right; }
+  .feed-post-caption { padding: 12px 16px 6px; font-size: 15px; white-space: pre-wrap; }
+  .feed-post-actions { padding: 4px 16px 16px; }
+  .feed-post-actions .pill-btn { width: 100%; }
+  .composer-header { display: flex; align-items: flex-start; gap: 10px; }
+  .composer-header textarea {
+    flex: 1; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    padding: 10px 12px; font-family: 'Inter', sans-serif; font-size: 15px;
+    background: var(--bg); color: var(--text); resize: vertical; min-height: 44px;
+  }
+  .composer-preview { margin-top: 10px; }
+  .composer-preview img { width: 100%; max-height: 220px; object-fit: cover; border-radius: var(--radius-sm); display: block; }
+  .composer-remove-photo { margin-top: 6px; font-size: 13px; color: var(--danger); background: none; border: none; padding: 0; cursor: pointer; font-weight: 600; }
+  .composer-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+  .composer-photo-label { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--text-muted); cursor: pointer; }
+  .composer-photo-label svg { width: 18px; height: 18px; }
+  .itinerary-header-wrap { border-radius: var(--radius); overflow: hidden; margin-bottom: 8px; }
+  .itinerary-header-wrap .photo-wrap { height: 190px; }
+  .segmented { display: flex; gap: 8px; margin-bottom: 20px; }
+  .segmented button {
+    flex: 1; padding: 11px; border-radius: 999px; border: 1.5px solid var(--border);
+    background: var(--surface); color: var(--text-muted); font-weight: 600; font-size: 14px; cursor: pointer;
+  }
+  .segmented button.active { background: var(--them); border-color: var(--them); color: white; }
+  .day-item { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .day-item:last-child { border-bottom: none; }
+  .day-badge {
+    flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; background: var(--them-light); color: var(--them-dark);
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px;
+  }
+  .day-title { font-size: 16px; font-weight: 600; padding-top: 6px; }
+  .day-detail { font-size: 14px; color: var(--text-muted); margin-top: 5px; line-height: 1.5; }
+
+  /* ---------- Tab 2: Book ---------- */
+  .lang-bar { display: flex; align-items: center; gap: 12px; }
+  .lang-field { flex: 1; }
+  .swap-btn {
+    width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--border);
+    background: var(--bg); cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); flex-shrink: 0; margin-top: 18px;
+  }
+  .swap-btn svg { width: 18px; height: 18px; }
+  .field-row { display: flex; gap: 12px; margin-bottom: 16px; }
+  .field-row > div { flex: 1; }
+  .flight-card, .ride-card, .booking-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
+  .flight-info .airline, .ride-info .name, .booking-info .route { font-weight: 600; font-size: 16px; }
+  .flight-info .times, .booking-info .times { font-size: 15px; color: var(--text); margin-top: 2px; }
+  .flight-info .meta, .ride-info .meta, .booking-info .meta { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+  .flight-price, .ride-price { text-align: right; }
+  .flight-price .amount, .ride-price .amount { font-weight: 700; font-size: 19px; color: var(--them-dark); }
+  .flight-price .label, .ride-price .label { font-size: 12px; color: var(--text-muted); }
+  .review-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 15px; }
+  .review-row:last-child { border-bottom: none; }
+  .review-row .row-label { color: var(--text-muted); }
+  .checkbox-row { display: flex; align-items: center; gap: 10px; font-size: 15px; padding: 10px 0; }
+  .checkbox-row input { width: 20px; height: 20px; }
+  .step-tracker { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px; }
+  .confirm-hero { text-align: center; padding: 24px 0 20px; }
+  .confirm-check { width: 64px; height: 64px; border-radius: 50%; background: var(--them-light); color: var(--them); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .confirm-check svg { width: 32px; height: 32px; }
+  .confirm-code { display: inline-block; background: var(--them-light); color: var(--them-dark); font-weight: 700; font-size: 20px; letter-spacing: 0.08em; padding: 8px 18px; border-radius: var(--radius-sm); margin: 12px 0; }
+  .loading-line { text-align: center; padding: 30px 0; color: var(--text-muted); font-size: 15px; }
+
+  /* ---------- Tab 3: Track ---------- */
+  .map-frame-wrap { position: relative; border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; }
+  .map-frame { width: 100%; height: 220px; border: none; display: block; }
+  .location-banner {
+    position: absolute; top: 12px; left: 12px; display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.92); padding: 7px 14px; border-radius: 999px;
+    font-size: 13px; font-weight: 600; color: var(--them-dark);
+  }
+  .location-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--them); flex-shrink: 0; animation: dotpulse 1.6s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) { .location-dot { animation: none; } }
+  @keyframes dotpulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+  .chat-card { padding: 16px; }
+  .chat-list { display: flex; flex-direction: column; gap: 10px; max-height: 340px; overflow-y: auto; padding-bottom: 6px; }
+  .chat-msg { display: flex; flex-direction: column; max-width: 78%; }
+  .chat-msg.me { align-self: flex-end; align-items: flex-end; }
+  .chat-msg.family, .chat-msg.admin { align-self: flex-start; align-items: flex-start; }
+  .chat-msg.system { align-self: center; max-width: 90%; }
+  .chat-sender { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 3px; }
+  .admin-tag { background: var(--admin-light); color: var(--admin); font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 1px 6px; border-radius: 999px; margin-left: 4px; }
+  .chat-bubble { padding: 10px 14px; border-radius: 16px; font-size: 15px; line-height: 1.4; }
+  .chat-bubble.has-photo { padding: 6px; }
+  .chat-photo { width: 100%; max-width: 220px; border-radius: 10px; display: block; }
+  .chat-photo-caption { padding: 8px 6px 2px; }
+  .chat-msg.me .chat-bubble { background: var(--them); color: white; border-bottom-right-radius: 4px; }
+  .chat-msg.family .chat-bubble { background: var(--bg); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+  .chat-msg.admin .chat-bubble { background: var(--admin-light); border: 1px solid #EBD9A8; border-bottom-left-radius: 4px; }
+  .chat-msg.system { background: var(--danger-light); color: var(--danger); font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 999px; text-align: center; }
+  .chat-time { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+  .sos-row { display: flex; gap: 10px; margin: 4px 0 12px; }
+  .sos-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 13px; border-radius: var(--radius-sm); border: 1.5px solid var(--danger-light);
+    background: var(--danger-light); color: var(--danger); font-weight: 700; font-size: 14px; cursor: pointer;
+  }
+  .sos-btn svg { width: 18px; height: 18px; }
+  .chat-input-bar { display: flex; gap: 8px; align-items: center; }
+  .chat-input-bar input { flex: 1; border-radius: 999px; padding: 12px 16px; }
+  .chat-send-btn {
+    width: 44px; height: 44px; border-radius: 50%; background: var(--them); color: white; border: none;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+  }
+  .chat-send-btn svg { width: 20px; height: 20px; }
+
+  /* ---------- Tab 4: Go (Navigate / Translate) ---------- */
+  .go-hub-card { display: flex; align-items: center; gap: 16px; cursor: pointer; padding: 22px 20px; }
+  .go-hub-card .icon-circle { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; }
+  .go-hub-card .icon-circle svg { width: 26px; height: 26px; }
+  .go-hub-card .go-title { font-size: 18px; font-weight: 600; }
+  .go-hub-card .go-sub { font-size: 14px; color: var(--text-muted); margin-top: 2px; }
+  .go-hub-card .chevron { margin-left: auto; color: var(--text-muted); flex-shrink: 0; }
+  .go-hub-card .chevron svg { width: 20px; height: 20px; }
+  .tagline { color: var(--text-muted); font-size: 15px; margin: 0; }
+  .nav-mode-detail-title { font-size: 22px; font-weight: 700; }
+  .actions { display: flex; gap: 14px; margin-bottom: 14px; }
+  .action-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 20px 12px;
+    border-radius: var(--radius); cursor: pointer; background: var(--surface); border: 1.5px solid var(--border);
+    color: var(--text); transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .action-btn .icon-circle { width: 54px; height: 54px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; }
+  .action-btn .icon-circle svg { width: 24px; height: 24px; }
+  .action-btn .label { font-size: 16px; font-weight: 600; }
+  .action-btn .sublabel { font-size: 13px; color: var(--text-muted); text-align: center; }
+  .listen-btn .icon-circle { background: var(--them); }
+  .speak-btn .icon-circle { background: var(--you); }
+  .action-btn.active { border-color: var(--danger); box-shadow: 0 0 0 3px var(--danger-light); }
+  .action-btn.active .icon-circle { background: var(--danger); animation: pulse 1.4s ease-out infinite; }
+  .action-btn.active .label { color: var(--danger); }
+  @media (prefers-reduced-motion: reduce) { .action-btn.active .icon-circle { animation: none; } }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(179,38,30,0.25); } 70% { box-shadow: 0 0 0 20px rgba(179,38,30,0); } 100% { box-shadow: 0 0 0 0 rgba(179,38,30,0); } }
+  .toggle-row { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 14px; color: var(--text-muted); font-weight: 500; margin-bottom: 20px; cursor: pointer; user-select: none; }
+  .toggle-track { position: relative; width: 40px; height: 22px; background: var(--border); border-radius: 999px; flex-shrink: 0; transition: background 0.2s ease; }
+  .toggle-row input { position: absolute; opacity: 0; width: 40px; height: 22px; margin: 0; cursor: pointer; }
+  .toggle-knob { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: white; border-radius: 50%; transition: transform 0.2s ease; pointer-events: none; }
+  .toggle-row:has(input:checked) .toggle-knob { transform: translateX(18px); }
+  .toggle-row:has(input:checked) .toggle-track { background: var(--them); }
+  .stage { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--border); border-radius: var(--radius); padding: 20px 22px; margin-bottom: 20px; min-height: 90px; }
+  .stage.mode-them { border-left-color: var(--them); }
+  .stage.mode-you { border-left-color: var(--you); }
+  .stage-status-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .stage-tag { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 9px; border-radius: 999px; display: none; }
+  .stage.mode-them .stage-tag.them-tag { display: inline-block; background: var(--them-light); color: var(--them-dark); }
+  .stage.mode-you .stage-tag.you-tag { display: inline-block; background: var(--you-light); color: var(--you-dark); }
+  .stage-status { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); margin: 0; }
+  .stage-text { font-size: 22px; font-weight: 500; line-height: 1.4; }
+  .stage-text .original { display: block; margin-top: 8px; font-size: 15px; font-weight: 400; color: var(--text-muted); }
+  .stage-placeholder { color: var(--text-muted); font-size: 16px; font-weight: 400; }
+  .error-banner { background: var(--danger-light); color: var(--danger); border-radius: var(--radius-sm); padding: 14px 16px; font-size: 15px; font-weight: 500; margin-bottom: 20px; display: none; }
+  .error-banner.show { display: block; }
+  .history-list { list-style: none; margin: 0 0 20px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .history-item { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; font-size: 15px; }
+  .history-item.tag-them { border-left-color: var(--them); }
+  .history-item.tag-you { border-left-color: var(--you); }
+  .history-item .tag { display: inline-block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; padding: 2px 8px; border-radius: 999px; margin-bottom: 6px; }
+  .history-item.tag-them .tag { background: var(--them-light); color: var(--them-dark); }
+  .history-item.tag-you .tag { background: var(--you-light); color: var(--you-dark); }
+  .history-item .line { margin-top: 3px; }
+  .history-item .line.muted { color: var(--text-muted); font-size: 14px; }
+  .empty-history { color: var(--text-muted); font-size: 15px; font-style: italic; list-style: none; }
+  .atlas-note { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+  .inline-error { font-size: 13px; color: var(--danger); margin-top: 8px; font-weight: 500; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ================= TAB 1: PLAN ================= -->
+  <section class="tab-panel visible" id="tab-plan">
+    <div id="plan-feed-view">
+      <h1>Explore</h1>
+      <p class="tagline" style="margin-bottom:20px;">See where your friends have been, or share your own trip.</p>
+
+      <div class="card">
+        <div class="composer-header">
+          <div class="avatar-circle"><img src="https://api.dicebear.com/10.x/lorelei/svg?seed=You" alt="You"></div>
+          <textarea id="composer-text" rows="2" placeholder="Share something about your trip..."></textarea>
+        </div>
+        <div class="composer-preview" id="composer-preview" style="display:none;">
+          <img id="composer-preview-img" src="" alt="Your photo">
+          <button class="composer-remove-photo" id="composer-remove-photo">Remove photo</button>
+        </div>
+        <div class="composer-actions">
+          <label class="composer-photo-label">
+            <input type="file" id="composer-photo-input" accept="image/*" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            Add photo
+          </label>
+          <button class="pill-btn primary" id="composer-post-btn">Post</button>
+        </div>
+        <p class="inline-error" id="composer-error" style="display:none;"></p>
+      </div>
+
+      <div id="feed-list"></div>
+    </div>
+    <div id="plan-itinerary-view" style="display:none;">
+      <button class="back-link" id="itinerary-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+      </button>
+      <div class="itinerary-header-wrap" id="itinerary-image-slot"></div>
+      <h1 id="itinerary-title">Destination</h1>
+      <p class="tagline" id="itinerary-sub" style="margin-bottom:20px;"></p>
+      <div class="segmented" id="itinerary-segmented"></div>
+      <div class="card" id="itinerary-days-card"></div>
+      <button class="pill-btn primary" id="itinerary-book-btn" style="width:100%;">Book this trip</button>
+    </div>
+  </section>
+
+  <!-- ================= TAB 2: BOOK ================= -->
+  <section class="tab-panel" id="tab-book">
+    <div id="book-search-view">
+      <h1>Book a flight</h1>
+      <p class="tagline" style="margin-bottom:20px;">Powered by Atlas flight search.</p>
+      <div class="card">
+        <div class="field-row">
+          <div>
+            <label class="field-label" for="book-origin">From</label>
+            <select id="book-origin"></select>
+          </div>
+          <div>
+            <label class="field-label" for="book-destination">To</label>
+            <select id="book-destination"></select>
+          </div>
+        </div>
+        <label class="field-label" for="book-date">Depart on</label>
+        <input type="date" id="book-date" style="margin-bottom:18px;">
+        <button class="pill-btn primary" id="book-search-btn" style="width:100%;">Search flights</button>
+        <p class="atlas-note">Calls Atlas <code>search.do</code></p>
+      </div>
+
+      <h2 style="margin-top:8px;">Existing Bookings</h2>
+      <p class="toast-note" id="book-toast"></p>
+      <div id="existing-bookings-list"></div>
+    </div>
+
+    <div id="book-loading-view" style="display:none;">
+      <p class="loading-line" id="book-loading-text">Searching flights...</p>
+    </div>
+
+    <div id="book-results-view" style="display:none;">
+      <button class="back-link" id="results-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Change search
+      </button>
+      <h2 id="results-title">Flights</h2>
+      <p class="tagline" style="margin-bottom:16px;" id="results-sub"></p>
+      <div id="flight-list"></div>
+    </div>
+
+    <div id="book-review-view" style="display:none;">
+      <button class="back-link" id="review-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Back to flights
+      </button>
+      <div class="step-tracker">Review and confirm</div>
+      <h2>Your flight</h2>
+      <div class="card" id="review-flight-card"></div>
+
+      <h2>Traveler details</h2>
+      <div class="card">
+        <label class="field-label" for="review-name">Traveler name</label>
+        <input type="text" id="review-name" placeholder="Full name" value="Tan Ah Seng" style="margin-bottom:16px;">
+
+        <div id="real-passenger-fields" style="display:none;">
+          <p class="atlas-note" style="margin-bottom:12px;">This is a real Atlas flight. These fields are required by Atlas's own booking rules for this route.</p>
+          <label class="field-label" for="review-gender">Gender</label>
+          <select id="review-gender" style="margin-bottom:16px;">
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+          </select>
+          <label class="field-label" for="review-birthday">Date of birth</label>
+          <input type="date" id="review-birthday" value="1965-08-09" style="margin-bottom:16px;">
+          <label class="field-label" for="review-email">Contact email</label>
+          <input type="text" id="review-email" placeholder="you@example.com" value="ah-seng@outlook.com" style="margin-bottom:16px;">
+          <label class="field-label" for="review-passport">Passport or ID number (optional for this route)</label>
+          <input type="text" id="review-passport" placeholder="Passport number" value="K50123456Z" style="margin-bottom:16px;">
+          <label class="field-label" for="review-nationality">Nationality (optional, e.g. US)</label>
+          <input type="text" id="review-nationality" placeholder="Country code" style="margin-bottom:6px;">
+        </div>
+
+        <label class="field-label" for="review-seat">Seat preference</label>
+        <select id="review-seat" style="margin-bottom:6px;">
+          <option value="aisle">Aisle seat</option>
+          <option value="window">Window seat</option>
+          <option value="any">No preference</option>
+        </select>
+        <p class="atlas-note" style="margin-bottom:16px;">Calls Atlas <code>seatAvailability.do</code></p>
+        <div class="checkbox-row">
+          <input type="checkbox" id="review-baggage">
+          <label for="review-baggage">Add checked baggage (plus 25 dollars)</label>
+        </div>
+        <p class="atlas-note" style="margin-bottom:16px;">Calls Atlas <code>getLuggage.do</code></p>
+        <div class="checkbox-row">
+          <input type="checkbox" id="review-notify" checked>
+          <label for="review-notify">Notify family when booking is confirmed</label>
+        </div>
+        <p class="atlas-note">Sent through Atlas webhook notifications</p>
+      </div>
+
+      <div class="card" id="review-summary-card"></div>
+      <button class="pill-btn primary" id="review-confirm-btn" style="width:100%;">Confirm and book</button>
+      <p class="atlas-note" style="text-align:center;">This is the final approval step. Nothing is booked until you tap this button.</p>
+    </div>
+
+    <div id="book-processing-view" style="display:none;">
+      <p class="loading-line" id="book-processing-text">Placing your order...</p>
+    </div>
+
+    <div id="book-confirm-view" style="display:none;">
+      <div class="card confirm-hero">
+        <div class="confirm-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h1>Booked!</h1>
+        <p class="tagline">Your flight is confirmed.</p>
+        <div class="confirm-code" id="confirm-code">PNR</div>
+        <p class="tagline" id="confirm-notify-line"></p>
+      </div>
+      <button class="pill-btn ghost" id="confirm-done-btn" style="width:100%;">Plan another trip</button>
+    </div>
+
+    <div id="book-detail-view" style="display:none;">
+      <button class="back-link" id="detail-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Back to bookings
+      </button>
+      <h1 id="detail-route-title">Route</h1>
+      <p class="tagline" id="detail-date-sub" style="margin-bottom:20px;"></p>
+      <div class="card" id="detail-flight-card"></div>
+
+      <h2>Seat</h2>
+      <div class="card">
+        <select id="detail-seat-select" style="margin-bottom:12px;">
+          <option value="aisle">Aisle seat</option>
+          <option value="window">Window seat</option>
+          <option value="any">No preference</option>
+        </select>
+        <button class="pill-btn primary" id="detail-seat-save" style="width:100%;">Save seat preference</button>
+        <p class="atlas-note">Calls Atlas <code>seatAvailability.do</code></p>
+      </div>
+
+      <h2>Baggage</h2>
+      <div class="card">
+        <div class="checkbox-row">
+          <input type="checkbox" id="detail-baggage-checkbox">
+          <label for="detail-baggage-checkbox">Checked baggage, 20kg (plus 25 dollars)</label>
+        </div>
+        <button class="pill-btn primary" id="detail-baggage-save" style="width:100%; margin-top:10px;">Save baggage</button>
+        <p class="atlas-note">Calls Atlas <code>getLuggage.do</code></p>
+      </div>
+
+      <div class="card" style="display:flex; gap:10px;">
+        <button class="pill-btn ghost" id="detail-share-btn" style="flex:1;">Share trip</button>
+        <button class="pill-btn danger" id="detail-refund-btn" style="flex:1;">Request refund</button>
+      </div>
+      <p class="atlas-note" style="text-align:center;">Refunds call Atlas refund quotation and submission APIs.</p>
+      <p class="inline-error" id="detail-share-note" style="display:none;"></p>
+    </div>
+  </section>
+
+  <!-- ================= TAB 3: TRACK ================= -->
+  <section class="tab-panel" id="tab-track">
+    <h1>Track</h1>
+    <p class="tagline" style="margin-bottom:20px;">Share your location and stay connected with family.</p>
+
+    <div class="map-frame-wrap">
+      <iframe class="map-frame" id="track-map-frame" title="Live location map" loading="lazy"></iframe>
+      <div class="location-banner"><span class="location-dot"></span><span id="location-status">Getting location...</span></div>
+    </div>
+
+    <p class="toast-note" id="track-banner"></p>
+
+    <div class="card chat-card">
+      <div class="chat-list" id="chat-list"></div>
+    </div>
+
+    <div class="sos-row">
+      <button class="sos-btn" id="sos-family-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        Call Family
+      </button>
+      <button class="sos-btn" id="sos-admin-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Alert Admin
+      </button>
+    </div>
+
+    <div class="chat-input-bar">
+      <input type="text" id="chat-input" placeholder="Message the family chat...">
+      <button class="chat-send-btn" id="chat-send-btn" aria-label="Send message">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ================= TAB 4: GO ================= -->
+  <section class="tab-panel" id="tab-go">
+    <div class="sub-view visible" id="go-hub">
+      <h1>Go</h1>
+      <p class="tagline" style="margin-bottom:20px;">Get around, or talk with anyone.</p>
+      <div class="card go-hub-card" id="go-open-navigate">
+        <span class="icon-circle" style="background:var(--them);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+        </span>
+        <div><div class="go-title">Navigate</div><div class="go-sub">Plan a route, or hail a ride</div></div>
+        <span class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span>
+      </div>
+      <div class="card go-hub-card" id="go-open-translate">
+        <span class="icon-circle" style="background:var(--you);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </span>
+        <div><div class="go-title">Translate</div><div class="go-sub">Speak and understand any language</div></div>
+        <span class="chevron"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></span>
+      </div>
+    </div>
+
+    <!-- ---- Go: Navigate ---- -->
+    <div class="sub-view" id="go-navigate">
+      <button class="back-link" id="navigate-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+      </button>
+      <h1>Navigate</h1>
+      <div class="card">
+        <label class="field-label" for="nav-destination">Where to?</label>
+        <input type="text" id="nav-destination" placeholder="Enter a destination" style="margin-bottom:14px;">
+        <button class="pill-btn primary" id="nav-get-directions-btn" style="width:100%;">Get directions</button>
+      </div>
+
+      <div id="nav-modes-section" style="display:none;">
+        <div class="segmented" id="nav-mode-segmented">
+          <button data-mode="walk" class="active">Walk</button>
+          <button data-mode="transit">Transit</button>
+          <button data-mode="cab">Cab</button>
+        </div>
+        <div class="card" id="nav-mode-detail"></div>
+      </div>
+
+      <div class="map-frame-wrap">
+        <iframe class="map-frame" id="navigate-map-frame" title="Your current location" loading="lazy"></iframe>
+      </div>
+
+      <div class="card" style="text-align:center;">
+        <button class="pill-btn secondary" id="quick-ride-btn" style="width:100%;">Book a ride now</button>
+        <p class="atlas-note" id="quick-ride-price" style="text-align:center;">Enter a destination and tap Get directions to see a price.</p>
+      </div>
+      <div id="ride-results"></div>
+    </div>
+
+    <!-- ---- Go: Translate ---- -->
+    <div class="sub-view" id="go-translate">
+      <button class="back-link" id="translate-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+      </button>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <svg viewBox="0 0 64 64" style="width:32px; height:32px; flex-shrink:0;"><circle cx="30" cy="36" r="20" fill="#1D6B5E"/><path d="M46 30 L58 25 L48 37 Z" fill="#B4552A"/><circle cx="22" cy="30" r="3.5" fill="#161311"/><path d="M20.5 27 L22 23.5 L23.5 27 Z" fill="#FFFFFF"/></svg>
+        <h1 style="margin:0;">Bird</h1>
+      </div>
+      <p class="tagline" style="margin-bottom:24px;">Understand what is around you. Speak and be understood.</p>
+
+      <div class="actions">
+        <button class="action-btn listen-btn" id="listen-btn">
+          <span class="icon-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+          </span>
+          <span class="label" id="listen-label">Start conversation</span>
+          <span class="sublabel">Hear what is around you, translated</span>
+        </button>
+        <button class="action-btn speak-btn" id="speak-btn">
+          <span class="icon-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          </span>
+          <span class="label" id="speak-label">Speak</span>
+          <span class="sublabel">Say something, they will hear it translated</span>
+        </button>
+      </div>
+
+      <label class="toggle-row">
+        <span class="toggle-track"><span class="toggle-knob"></span></span>
+        <input type="checkbox" id="read-aloud-toggle" checked>
+        Read translations aloud, like a natural conversation
+      </label>
+
+      <div class="stage" id="stage">
+        <div class="stage-status-row">
+          <span class="stage-tag them-tag">Them</span>
+          <span class="stage-tag you-tag">You</span>
+          <p class="stage-status" id="stage-status">Ready</p>
+        </div>
+        <p class="stage-text" id="stage-text"><span class="stage-placeholder">Tap a button above to begin.</span></p>
+      </div>
+
+      <div class="error-banner" id="error-banner" role="alert"></div>
+
+      <h2 style="font-size:16px; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); margin-bottom:12px;">History</h2>
+      <ul class="history-list" id="history-list">
+        <li class="empty-history">Nothing yet. Your conversation will appear here.</li>
+      </ul>
+
+      <div class="card">
+        <div class="lang-bar">
+          <div class="lang-field">
+            <label class="field-label" for="lang-you">Your language</label>
+            <select id="lang-you" aria-label="Your language"></select>
+          </div>
+          <button class="swap-btn" id="swap-btn" aria-label="Swap languages">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          </button>
+          <div class="lang-field">
+            <label class="field-label" for="lang-them">Their language</label>
+            <select id="lang-them" aria-label="Their language"></select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TAB BAR ================= -->
+  <nav class="tab-bar">
+    <div class="tab-bar-inner">
+      <button class="tab-btn active" data-tab="tab-plan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+        Plan
+      </button>
+      <button class="tab-btn" data-tab="tab-book">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 16l20-8-8 20-3-8-9-4z"/></svg>
+        Book
+      </button>
+      <button class="tab-btn" data-tab="tab-track">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9"/><line x1="12" y1="3" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="21"/><line x1="3" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="21" y2="12"/></svg>
+        Track
+      </button>
+      <button class="tab-btn" data-tab="tab-go">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 4 15 12 5 20"/><polyline points="12 4 22 12 12 20"/></svg>
+        Go
+      </button>
+    </div>
+  </nav>
+</div>
+
+<script>
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-panel').forEach(function (el) { el.classList.remove('visible'); });
+  document.getElementById(tabId).classList.add('visible');
+  document.querySelectorAll('.tab-btn').forEach(function (btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+  });
+  if (tabId === 'tab-track') initTrackMap();
+}
+document.querySelectorAll('.tab-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () { switchTab(btn.getAttribute('data-tab')); });
+});
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function showToast(elId, message) {
+  var el = document.getElementById(elId);
+  el.textContent = message;
+  el.classList.add('show');
+  setTimeout(function () { el.classList.remove('show'); }, 3000);
+}
+
+var PIN_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>';
+
+/* =============================================================
+   TAB 1: PLAN — social feed, composer, and itinerary preview
+   ============================================================= */
+var DESTINATIONS = [
+  {
+    id: 'yunnan', name: 'Yunnan, China', code: 'KMG', airportName: 'Kunming Changshui',
+    friend: 'Mei Ling', initials: 'ML', avatarColor: '#1D6B5E',
+    photoUrl: 'https://images.unsplash.com/photo-1724477857363-6a727a9c955c?auto=format&fit=crop&w=1000&q=75',
+    photoCredit: 'Wietse Jongsma / Unsplash',
+    caption: 'Wah the Yunnan trip you all... rice terraces so shiok can see until forget got kids waiting at home! Must go during sunrise, tour guide say best time. Next time bring whole family also can lah.',
+    itineraries: {
+      short: [
+        { title: 'Arrive in Kunming, explore Green Lake Park', detail: 'Settle into your hotel, then take an easy afternoon stroll around Green Lake Park before trying crossing-the-bridge rice noodles for dinner, a Yunnan specialty worth planning your first night around.' },
+        { title: 'Travel to Dali, walk the Old Town walls', detail: 'A short flight or scenic bus ride brings you to Dali. Spend the afternoon wandering the cobblestone Old Town, then catch sunset over Erhai Lake from one of the lakeside cafes.' },
+        { title: 'Three Pagodas, then fly home in the evening', detail: 'Visit the Three Pagodas of Chongsheng Temple in the morning while it is quiet, grab a light lunch in town, and head to the airport for an evening flight home.' }
+      ],
+      mid: [
+        { title: 'Arrive in Kunming, visit Green Lake Park', detail: 'Settle into your hotel, then take an easy afternoon stroll around Green Lake Park before trying crossing-the-bridge rice noodles for dinner.' },
+        { title: 'Day trip to the Stone Forest', detail: 'Head out early to beat the tour buses at Shilin, the otherworldly limestone Stone Forest about ninety minutes from Kunming. Wear comfortable shoes for the walking paths.' },
+        { title: 'Travel to Dali, explore the Old Town', detail: 'Continue on to Dali by train or bus. Spend the afternoon browsing craft shops along Renmin Road and sampling local snacks before settling in for the night.' },
+        { title: 'Cycle around Erhai Lake, visit Xizhou', detail: 'Rent a bicycle or e-scooter and ride part of the Erhai Lake loop, stopping in the Bai ethnic village of Xizhou for its courtyard houses and local flatbread.' },
+        { title: 'Fly home from Dali or Kunming', detail: 'Use the morning for last-minute souvenir shopping in Dali before heading to the airport, connecting through Kunming if needed for your flight home.' }
+      ],
+      long: [
+        { title: 'Arrive in Kunming, visit Green Lake Park', detail: 'Settle into your hotel, then take an easy afternoon stroll around Green Lake Park before trying crossing-the-bridge rice noodles for dinner.' },
+        { title: 'Day trip to the Stone Forest', detail: 'Head out early to beat the tour buses at Shilin, the otherworldly limestone Stone Forest about ninety minutes from Kunming. Wear comfortable shoes for the walking paths.' },
+        { title: 'Travel to Dali, explore the Old Town', detail: 'Continue on to Dali by train or bus. Spend the afternoon browsing craft shops along Renmin Road and sampling local snacks before settling in for the night.' },
+        { title: 'Cycle around Erhai Lake, visit Xizhou', detail: 'Rent a bicycle or e-scooter and ride part of the Erhai Lake loop, stopping in the Bai ethnic village of Xizhou for its courtyard houses and local flatbread.' },
+        { title: 'Travel to Lijiang, wander the Old Town', detail: 'Take a short flight or train to Lijiang. Spend the evening wandering its lantern-lit canals and old wooden buildings, best explored on foot after dark.' },
+        { title: 'Shuhe Ancient Town and Black Dragon Pool', detail: 'Visit the quieter Shuhe Ancient Town in the morning, then walk to Black Dragon Pool Park for classic views of Jade Dragon Snow Mountain reflected in the water.' },
+        { title: 'Fly home from Lijiang', detail: 'Enjoy a relaxed final morning with coffee in the Old Town before heading to Lijiang Sanyi Airport for your flight home.' }
+      ]
+    }
+  },
+  {
+    id: 'bali', name: 'Bali, Indonesia', code: 'DPS', airportName: 'Ngurah Rai',
+    friend: 'Farah', initials: 'F', avatarColor: '#B4552A',
+    photoUrl: 'https://images.unsplash.com/photo-1557093793-e196ae071479?auto=format&fit=crop&w=1000&q=75',
+    photoCredit: 'Radoslav Bali / Unsplash',
+    caption: 'Alhamdulillah selamat balik from Bali trip! The kids enjoyed so much especially feeding the fish at Tirta Empul. Auntie tip - bring sarong, some temples need cover up one ok. Our tour guide also very good, patient with the old folks like us hehe.',
+    itineraries: {
+      short: [
+        { title: 'Arrive in Ubud, visit Tegallalang rice terrace', detail: 'Check into your Ubud accommodation, then head to the Tegallalang rice terraces for photos in the late afternoon light before browsing Ubud market for dinner.' },
+        { title: 'Tirta Empul temple, Kintamani volcano viewpoint', detail: 'Start at Tirta Empul for the holy spring water purification ritual, bring a sarong, then continue up to Kintamani for lunch overlooking Mount Batur.' },
+        { title: 'Uluwatu temple at sunset, then fly home', detail: 'Spend the morning relaxing or shopping, then head south to Uluwatu Temple in the late afternoon to watch the sunset over the cliffs before your evening flight.' }
+      ],
+      mid: [
+        { title: 'Arrive in Ubud, visit Tegallalang rice terrace', detail: 'Check into your Ubud accommodation, then head to the Tegallalang rice terraces for photos in the late afternoon light before browsing Ubud market for dinner.' },
+        { title: 'Tirta Empul temple, Kintamani volcano viewpoint', detail: 'Start at Tirta Empul for the holy spring water purification ritual, bring a sarong, then continue up to Kintamani for lunch overlooking Mount Batur.' },
+        { title: 'Beach day in Seminyak, Tanah Lot at sunset', detail: 'Take it easy with a morning at the beach clubs in Seminyak, then drive out to Tanah Lot in the late afternoon to see the sea temple as the tide comes in.' },
+        { title: 'Uluwatu temple, Kecak fire dance at night', detail: 'Visit Uluwatu Temple in the late afternoon for the clifftop views, then stay for the Kecak fire dance performance at sunset.' },
+        { title: 'Free morning, fly home in the afternoon', detail: 'Use the morning for last-minute shopping in Ubud or a spa treatment before heading to Ngurah Rai airport.' }
+      ],
+      long: [
+        { title: 'Arrive in Ubud, visit Tegallalang rice terrace', detail: 'Check into your Ubud accommodation, then head to the Tegallalang rice terraces for photos in the late afternoon light before browsing Ubud market for dinner.' },
+        { title: 'Tirta Empul temple, Kintamani volcano viewpoint', detail: 'Start at Tirta Empul for the holy spring water purification ritual, bring a sarong, then continue up to Kintamani for lunch overlooking Mount Batur.' },
+        { title: 'Beach day in Seminyak, Tanah Lot at sunset', detail: 'Take it easy with a morning at the beach clubs in Seminyak, then drive out to Tanah Lot in the late afternoon to see the sea temple as the tide comes in.' },
+        { title: 'Day trip to Nusa Penida for coastal views', detail: 'Take an early boat from Sanur to Nusa Penida. Visit Kelingking Beach and Angel Billabong for the island most dramatic coastal viewpoints, back by late afternoon.' },
+        { title: 'Spa and relaxation day in Ubud', detail: 'After a few active days, slow down with a traditional Balinese massage and a quiet walk along the Campuhan Ridge before dinner in Ubud.' },
+        { title: 'Uluwatu temple, Kecak fire dance at night', detail: 'Visit Uluwatu Temple in the late afternoon for the clifftop views, then stay for the Kecak fire dance performance at sunset.' },
+        { title: 'Free morning, fly home in the afternoon', detail: 'Use the morning for last-minute shopping in Ubud or a spa treatment before heading to Ngurah Rai airport.' }
+      ]
+    }
+  },
+  {
+    id: 'kyoto', name: 'Kyoto, Japan', code: 'KIX', airportName: 'Kansai',
+    friend: 'Hock Seng', initials: 'HS', avatarColor: '#7A3A1B',
+    photoUrl: 'https://images.unsplash.com/photo-1714214800596-1f98c5dee4bd?auto=format&fit=crop&w=1000&q=75',
+    photoCredit: 'David Emrich / Unsplash',
+    caption: 'The sakura season really no joke, so beautiful until wife also quiet down for once hor. Must book hotel early ah, we nearly cannot get room near the station. Fushimi Inari got so many stairs, bring good walking shoes, dont wear new shoes like me last time!',
+    itineraries: {
+      short: [
+        { title: 'Fushimi Inari shrine, the thousand torii gates', detail: 'Arrive early morning to beat the crowds and walk as far up the mountain path through the vermilion torii gates as you like, even the first thirty minutes are worth it.' },
+        { title: 'Kinkaku-ji, then walk through Gion district', detail: 'Visit the Golden Pavilion in the morning, then spend the afternoon wandering Gion preserved streets, keeping an eye out for geiko and maiko heading to evening appointments.' },
+        { title: 'Arashiyama bamboo grove, then fly home', detail: 'Take an early train to Arashiyama to walk the bamboo grove before the tour groups arrive, then head back to Kansai Airport for your flight.' }
+      ],
+      mid: [
+        { title: 'Fushimi Inari shrine, the thousand torii gates', detail: 'Arrive early morning to beat the crowds and walk as far up the mountain path through the vermilion torii gates as you like.' },
+        { title: 'Kinkaku-ji, then walk through Gion district', detail: 'Visit the Golden Pavilion in the morning, then spend the afternoon wandering Gion preserved streets and back alleys.' },
+        { title: 'Arashiyama bamboo grove and Nijo Castle', detail: 'Spend the morning in Arashiyama bamboo grove and riverside area, then head back into the city for Nijo Castle famous nightingale floors in the afternoon.' },
+        { title: 'Day trip to Nara to see the deer park', detail: 'Take the train to Nara for the morning, feed the free-roaming deer at Nara Park, and visit Todai-ji temple to see its giant bronze Buddha.' },
+        { title: 'Free morning, fly home in the afternoon', detail: 'Enjoy a relaxed final morning browsing Nishiki Market for snacks and souvenirs before heading to Kansai Airport.' }
+      ],
+      long: [
+        { title: 'Fushimi Inari shrine, the thousand torii gates', detail: 'Arrive early morning to beat the crowds and walk as far up the mountain path through the vermilion torii gates as you like.' },
+        { title: 'Kinkaku-ji, then walk through Gion district', detail: 'Visit the Golden Pavilion in the morning, then spend the afternoon wandering Gion preserved streets and back alleys.' },
+        { title: 'Arashiyama bamboo grove and Nijo Castle', detail: 'Spend the morning in Arashiyama bamboo grove and riverside area, then head back into the city for Nijo Castle famous nightingale floors in the afternoon.' },
+        { title: 'Day trip to Nara to see the deer park', detail: 'Take the train to Nara for the morning, feed the free-roaming deer at Nara Park, and visit Todai-ji temple to see its giant bronze Buddha.' },
+        { title: 'Day trip to Osaka for food and city sights', detail: 'Take a short train to Osaka for the day, walk through Dotonbori for street food, and ride up Umeda Sky Building for panoramic views before returning to Kyoto.' },
+        { title: 'Tea ceremony, walk the Philosophers Path', detail: 'Book a traditional tea ceremony experience in the morning, then spend the afternoon strolling the Philosophers Path between Ginkaku-ji and Nanzen-ji.' },
+        { title: 'Free morning, fly home in the afternoon', detail: 'Enjoy a relaxed final morning browsing Nishiki Market for snacks and souvenirs before heading to Kansai Airport.' }
+      ]
+    }
+  },
+  {
+    id: 'chiangmai', name: 'Chiang Mai, Thailand', code: 'CNX', airportName: 'Chiang Mai',
+    friend: 'Siti', initials: 'S', avatarColor: '#993C1D',
+    photoUrl: 'https://images.unsplash.com/photo-1642037714916-de07cb65af06?auto=format&fit=crop&w=1000&q=75',
+    photoCredit: 'Polina Kocheva / Unsplash',
+    caption: 'Just came back lah! Went to the ethical elephant place, no riding one ok, very good got to bathe them somemore. The night market food also super value, can eat until so full only need like 15 dollars. Recommend to all my kakis who want to travel slow slow.',
+    itineraries: {
+      short: [
+        { title: 'Old city temples, Sunday walking market', detail: 'Visit Wat Phra Singh and Wat Chedi Luang in the old city in the morning, then in the evening join the Sunday walking street market for food stalls and local crafts.' },
+        { title: 'Ethical elephant sanctuary for the day', detail: 'Spend the day at a no-riding elephant sanctuary, helping prepare food and bathing the elephants in the river rather than riding them.' },
+        { title: 'Doi Suthep temple, then fly home', detail: 'Head up the mountain to Wat Phra That Doi Suthep in the morning for panoramic views over the city, then head to the airport for your flight home.' }
+      ],
+      mid: [
+        { title: 'Old city temples, Sunday walking market', detail: 'Visit Wat Phra Singh and Wat Chedi Luang in the old city in the morning, then in the evening join the Sunday walking street market for food stalls and local crafts.' },
+        { title: 'Ethical elephant sanctuary for the day', detail: 'Spend the day at a no-riding elephant sanctuary, helping prepare food and bathing the elephants in the river rather than riding them.' },
+        { title: 'Doi Suthep temple and mountain viewpoint', detail: 'Climb the naga staircase to Wat Phra That Doi Suthep in the morning, then continue a little further up the mountain to the Bhubing Palace gardens.' },
+        { title: 'Thai cooking class in the afternoon', detail: 'Join a half-day cooking class that starts with a local market tour, then learn to cook a few classic Northern Thai dishes like khao soi and som tam.' },
+        { title: 'Free morning, fly home in the afternoon', detail: 'Spend the morning at a cafe in the old city or picking up souvenirs from a local market before heading to Chiang Mai International Airport.' }
+      ],
+      long: [
+        { title: 'Old city temples, Sunday walking market', detail: 'Visit Wat Phra Singh and Wat Chedi Luang in the old city in the morning, then in the evening join the Sunday walking street market for food stalls and local crafts.' },
+        { title: 'Ethical elephant sanctuary for the day', detail: 'Spend the day at a no-riding elephant sanctuary, helping prepare food and bathing the elephants in the river rather than riding them.' },
+        { title: 'Doi Suthep temple and mountain viewpoint', detail: 'Climb the naga staircase to Wat Phra That Doi Suthep in the morning, then continue a little further up the mountain to the Bhubing Palace gardens.' },
+        { title: 'Thai cooking class in the afternoon', detail: 'Join a half-day cooking class that starts with a local market tour, then learn to cook a few classic Northern Thai dishes like khao soi and som tam.' },
+        { title: 'Day trip to Doi Inthanon national park', detail: 'Visit Thailand highest peak for cooler mountain air, walking trails through cloud forest, and the twin royal pagodas with views over the surrounding hills.' },
+        { title: 'Day trip to Pai, scenic mountain drive', detail: 'Take the winding mountain road to the laid-back town of Pai, stopping at viewpoints along the way, and spend the day at its canyon, hot springs, or riverside cafes.' },
+        { title: 'Free morning, fly home in the afternoon', detail: 'Spend the morning at a cafe in the old city or picking up souvenirs from a local market before heading to Chiang Mai International Airport.' }
+      ]
+    }
+  },
+  {
+    id: 'seoul', name: 'Seoul, South Korea', code: 'SEL', airportName: 'Incheon',
+    friend: 'Grace Tan', initials: 'GT', avatarColor: '#0C447C',
+    photoUrl: 'https://images.unsplash.com/photo-1566800890932-e89159daf3dc?auto=format&fit=crop&w=1000&q=75',
+    photoCredit: 'Adish (AJ) / Unsplash',
+    caption: 'Seoul was freezing but so worth it! Wore hanbok at Gyeongbokgung, everyone say I look like drama actress hehe. Food also super good, must try the tteokbokki near Myeongdong. Bring warm jacket if you go winter time ah!',
+    itineraries: {
+      short: [
+        { title: 'Gyeongbokgung Palace, Bukchon Hanok Village', detail: 'Rent a hanbok for free palace entry and photos at Gyeongbokgung in the morning, then walk through the traditional houses of nearby Bukchon Hanok Village in the afternoon.' },
+        { title: 'Myeongdong shopping, N Seoul Tower at night', detail: 'Spend the day browsing Myeongdong for skincare and street food, then head up to N Seoul Tower in the evening for panoramic night views of the city.' },
+        { title: 'Insadong tea houses, then fly home', detail: 'Wander Insadong in the morning for antiques, art galleries, and traditional tea houses, then head to Incheon Airport for your flight home.' }
+      ],
+      mid: [
+        { title: 'Gyeongbokgung Palace, Bukchon Hanok Village', detail: 'Rent a hanbok for free palace entry and photos at Gyeongbokgung in the morning, then walk through the traditional houses of nearby Bukchon Hanok Village in the afternoon.' },
+        { title: 'Myeongdong shopping, N Seoul Tower at night', detail: 'Spend the day browsing Myeongdong for skincare and street food, then head up to N Seoul Tower in the evening for panoramic night views of the city.' },
+        { title: 'Insadong tea houses and antiques', detail: 'Wander Insadong for antiques, art galleries, and traditional tea houses, a slower-paced day after two busy ones.' },
+        { title: 'Hongdae youth culture and cafes', detail: 'Explore Hongdae in the afternoon for street performances, indie shops, and themed cafes, staying into the evening for the neighborhood nightlife.' },
+        { title: 'Free morning, fly home in the afternoon', detail: 'Use the morning for last-minute shopping or a coffee in Itaewon before heading to Incheon Airport.' }
+      ],
+      long: [
+        { title: 'Gyeongbokgung Palace, Bukchon Hanok Village', detail: 'Rent a hanbok for free palace entry and photos at Gyeongbokgung in the morning, then walk through the traditional houses of nearby Bukchon Hanok Village in the afternoon.' },
+        { title: 'Myeongdong shopping, N Seoul Tower at night', detail: 'Spend the day browsing Myeongdong for skincare and street food, then head up to N Seoul Tower in the evening for panoramic night views of the city.' },
+        { title: 'Insadong tea houses and antiques', detail: 'Wander Insadong for antiques, art galleries, and traditional tea houses, a slower-paced day after two busy ones.' },
+        { title: 'Hongdae youth culture and cafes', detail: 'Explore Hongdae in the afternoon for street performances, indie shops, and themed cafes, staying into the evening for the neighborhood nightlife.' },
+        { title: 'Day trip to Nami Island', detail: 'Take an early train and ferry out to Nami Island for its tree-lined paths, a popular half-day escape from the city, especially scenic in autumn.' },
+        { title: 'Dongdaemun Design Plaza, night market', detail: 'Visit the futuristic Dongdaemun Design Plaza in the afternoon, then browse the surrounding night markets for late-night shopping and street food.' },
+        { title: 'Free morning, fly home in the afternoon', detail: 'Use the morning for last-minute shopping or a coffee in Itaewon before heading to Incheon Airport.' }
+      ]
+    }
+  }
+];
+
+var FEED_ITEMS = DESTINATIONS.slice();
+var currentDestination = null;
+var currentLength = 'short';
+var composerPhotoDataUrl = null;
+
+function photoBlock(dest) {
+  return '<div class="photo-wrap">' +
+    '<img src="' + dest.photoUrl + '" alt="' + escapeHtml(dest.name) + '" loading="lazy">' +
+    '<div class="photo-badge">' + PIN_SVG + '<span>' + escapeHtml(dest.name) + '</span></div>' +
+    '</div>' +
+    '<p class="photo-credit">Photo: ' + escapeHtml(dest.photoCredit) + '</p>';
+}
+
+function renderFeed() {
+  var list = document.getElementById('feed-list');
+  list.innerHTML = '';
+  FEED_ITEMS.forEach(function (item) {
+    var post = document.createElement('div');
+    post.className = 'card feed-post';
+    if (item.itineraries) {
+      post.innerHTML =
+        '<div class="feed-post-header">' +
+          '<div class="avatar-circle"><img src="https://api.dicebear.com/10.x/lorelei/svg?seed=' + encodeURIComponent(item.friend) + '" alt="' + escapeHtml(item.friend) + '"></div>' +
+          '<div><p class="name">' + escapeHtml(item.friend) + '</p><p class="meta">Posted photos from ' + escapeHtml(item.name) + '</p></div>' +
+        '</div>' +
+        photoBlock(item) +
+        '<p class="feed-post-caption">' + escapeHtml(item.caption) + '</p>' +
+        '<div class="feed-post-actions"><button class="pill-btn ghost" data-dest="' + item.id + '">See itinerary ideas</button></div>';
+    } else {
+      post.innerHTML =
+        '<div class="feed-post-header">' +
+          '<div class="avatar-circle"><img src="https://api.dicebear.com/10.x/lorelei/svg?seed=You" alt="You"></div>' +
+          '<div><p class="name">' + escapeHtml(item.authorName) + '</p><p class="meta">' + escapeHtml(item.time) + '</p></div>' +
+        '</div>' +
+        (item.photoDataUrl ? '<div class="photo-wrap"><img src="' + item.photoDataUrl + '" alt="Your travel photo"></div>' : '') +
+        '<p class="feed-post-caption">' + escapeHtml(item.caption) + '</p>';
+    }
+    list.appendChild(post);
+  });
+  list.querySelectorAll('button[data-dest]').forEach(function (btn) {
+    btn.addEventListener('click', function () { openItinerary(btn.getAttribute('data-dest')); });
+  });
+}
+renderFeed();
+
+document.getElementById('composer-photo-input').addEventListener('change', function (e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function (evt) {
+    composerPhotoDataUrl = evt.target.result;
+    document.getElementById('composer-preview-img').src = composerPhotoDataUrl;
+    document.getElementById('composer-preview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('composer-remove-photo').addEventListener('click', function () {
+  composerPhotoDataUrl = null;
+  document.getElementById('composer-photo-input').value = '';
+  document.getElementById('composer-preview').style.display = 'none';
+});
+
+document.getElementById('composer-post-btn').addEventListener('click', function () {
+  var text = document.getElementById('composer-text').value.trim();
+  var errorEl = document.getElementById('composer-error');
+  if (!text && !composerPhotoDataUrl) {
+    errorEl.textContent = 'Write something or add a photo first.';
+    errorEl.style.display = 'block';
+    return;
+  }
+  errorEl.style.display = 'none';
+  FEED_ITEMS.unshift({
+    id: 'user' + Date.now(),
+    authorName: 'You',
+    initials: 'Me',
+    caption: text || 'Shared a travel photo.',
+    photoDataUrl: composerPhotoDataUrl,
+    time: 'Just now'
+  });
+  document.getElementById('composer-text').value = '';
+  composerPhotoDataUrl = null;
+  document.getElementById('composer-photo-input').value = '';
+  document.getElementById('composer-preview').style.display = 'none';
+  renderFeed();
+});
+
+function openItinerary(destId) {
+  currentDestination = DESTINATIONS.find(function (d) { return d.id === destId; });
+  currentLength = 'short';
+  document.getElementById('plan-feed-view').style.display = 'none';
+  document.getElementById('plan-itinerary-view').style.display = 'block';
+  document.getElementById('itinerary-image-slot').innerHTML = photoBlock(currentDestination);
+  document.getElementById('itinerary-title').textContent = currentDestination.name;
+  document.getElementById('itinerary-sub').textContent = 'Based on ' + currentDestination.friend + ' trip. Pick a length to see the plan.';
+  renderSegmented();
+  renderItineraryDays();
+}
+
+function renderSegmented() {
+  var seg = document.getElementById('itinerary-segmented');
+  var options = [{ key: 'short', label: 'Short' }, { key: 'mid', label: 'Mid' }, { key: 'long', label: 'Long' }];
+  seg.innerHTML = '';
+  options.forEach(function (opt) {
+    var btn = document.createElement('button');
+    btn.textContent = opt.label + ' (' + currentDestination.itineraries[opt.key].length + 'D)';
+    btn.className = opt.key === currentLength ? 'active' : '';
+    btn.addEventListener('click', function () {
+      currentLength = opt.key;
+      renderSegmented();
+      renderItineraryDays();
+    });
+    seg.appendChild(btn);
+  });
+}
+
+function renderItineraryDays() {
+  var card = document.getElementById('itinerary-days-card');
+  var days = currentDestination.itineraries[currentLength];
+  card.innerHTML = days.map(function (day, i) {
+    return '<div class="day-item"><div class="day-badge">Day ' + (i + 1) + '</div>' +
+      '<div><div class="day-title">' + escapeHtml(day.title) + '</div>' +
+      '<div class="day-detail">' + escapeHtml(day.detail) + '</div></div></div>';
+  }).join('');
+}
+
+document.getElementById('itinerary-back').addEventListener('click', function () {
+  document.getElementById('plan-itinerary-view').style.display = 'none';
+  document.getElementById('plan-feed-view').style.display = 'block';
+});
+
+document.getElementById('itinerary-book-btn').addEventListener('click', function () {
+  bookingPrefill = { destCode: currentDestination.code, destName: currentDestination.name + ' (' + currentDestination.code + ')' };
+  switchTab('tab-book');
+  applyBookingPrefill();
+});
+
+/* =============================================================
+   TAB 2: BOOK — mocked Atlas booking flow + existing bookings
+   Function names map directly to the real Atlas API endpoints.
+   Swap the mock body for a real fetch() to go live.
+   ============================================================= */
+var ORIGINS = [
+  { code: 'JHB', name: 'Johor Bahru' },
+  { code: 'SIN', name: 'Singapore' },
+  { code: 'KUL', name: 'Kuala Lumpur' },
+  { code: 'CJU', name: 'Jeju' }
+];
+
+// Kept for future routes that need a booking-only option without a full Explore
+// post. Empty for now since Seoul moved into DESTINATIONS above.
+var BOOKING_ONLY_DESTINATIONS = [];
+
+function findDestinationName(code) {
+  var d = DESTINATIONS.find(function (x) { return x.code === code; });
+  if (d) return d.name;
+  var b = BOOKING_ONLY_DESTINATIONS.find(function (x) { return x.code === code; });
+  return b ? b.name : code;
+}
+
+var EXISTING_BOOKINGS = [
+  { orderNo: 'ATLQ7F2M9', originCode: 'JHB', originName: 'Johor Bahru', destCode: 'DPS', destName: 'Bali, Indonesia', date: '2026-10-02', departTime: '08:15', arriveTime: '12:50', airline: 'Pacific Wings', flightNumber: 'PW114', status: 'Ticketed', seatPref: 'aisle', hasBaggage: true },
+  { orderNo: 'ATLK3H8P1', originCode: 'SIN', originName: 'Singapore', destCode: 'KIX', destName: 'Kyoto, Japan', date: '2026-11-20', departTime: '23:40', arriveTime: '07:10', airline: 'Meridian Air', flightNumber: 'ME289', status: 'Awaiting ticketing', seatPref: 'window', hasBaggage: false }
+];
+
+var bookingPrefill = null;
+var selectedFlight = null;
+var currentBookingIndex = null;
+
+function statusBadgeHtml(status) {
+  var cls = status === 'Ticketed' ? 'them' : (status === 'Refund requested' || status === 'Refunded' ? 'danger' : 'admin');
+  return '<span class="status-badge ' + cls + '">' + escapeHtml(status) + '</span>';
+}
+
+function renderExistingBookings() {
+  var list = document.getElementById('existing-bookings-list');
+  if (EXISTING_BOOKINGS.length === 0) {
+    list.innerHTML = '<p class="tagline">No bookings yet.</p>';
+    return;
+  }
+  list.innerHTML = '';
+  EXISTING_BOOKINGS.forEach(function (b, idx) {
+    var card = document.createElement('div');
+    card.className = 'card booking-card';
+    card.innerHTML =
+      '<div class="booking-info">' +
+        '<div class="route">' + escapeHtml(b.originCode) + ' &#8594; ' + escapeHtml(b.destCode) + '</div>' +
+        '<div class="times">' + escapeHtml(b.date) + ' &middot; ' + escapeHtml(b.departTime) + ' - ' + escapeHtml(b.arriveTime) + '</div>' +
+        '<div class="meta">' + escapeHtml(b.airline) + ' ' + escapeHtml(b.flightNumber) + '</div>' +
+      '</div>' +
+      '<div>' + statusBadgeHtml(b.status) + '</div>';
+    card.addEventListener('click', function () { openBookingDetail(idx); });
+    list.appendChild(card);
+  });
+}
+renderExistingBookings();
+
+function openBookingDetail(idx) {
+  currentBookingIndex = idx;
+  var b = EXISTING_BOOKINGS[idx];
+  document.getElementById('detail-route-title').textContent = b.originCode + ' to ' + b.destCode;
+  document.getElementById('detail-date-sub').textContent = b.date + ' \u00b7 Order ' + b.orderNo;
+  document.getElementById('detail-flight-card').innerHTML =
+    '<div class="airline">' + escapeHtml(b.airline) + ' ' + escapeHtml(b.flightNumber) + '</div>' +
+    '<div class="times">' + escapeHtml(b.departTime) + ' to ' + escapeHtml(b.arriveTime) + '</div>' +
+    '<div class="meta">' + escapeHtml(b.originName) + ' (' + escapeHtml(b.originCode) + ') to ' + escapeHtml(b.destName) + ' (' + escapeHtml(b.destCode) + ')</div>' +
+    '<div style="margin-top:10px;">' + statusBadgeHtml(b.status) + '</div>';
+  document.getElementById('detail-seat-select').value = b.seatPref || 'any';
+  document.getElementById('detail-baggage-checkbox').checked = !!b.hasBaggage;
+  document.getElementById('detail-share-note').style.display = 'none';
+  showBookView('book-detail-view');
+}
+
+document.getElementById('detail-seat-save').addEventListener('click', function () {
+  var b = EXISTING_BOOKINGS[currentBookingIndex];
+  b.seatPref = document.getElementById('detail-seat-select').value;
+  showToast('book-toast', 'Seat preference updated with Atlas.');
+});
+
+document.getElementById('detail-baggage-save').addEventListener('click', function () {
+  var b = EXISTING_BOOKINGS[currentBookingIndex];
+  b.hasBaggage = document.getElementById('detail-baggage-checkbox').checked;
+  showToast('book-toast', 'Baggage updated with Atlas.');
+});
+
+document.getElementById('detail-refund-btn').addEventListener('click', function () {
+  var b = EXISTING_BOOKINGS[currentBookingIndex];
+  if (b.status === 'Refund requested' || b.status === 'Refunded') {
+    showToast('book-toast', 'A refund has already been requested for this booking.');
+    return;
+  }
+  showToast('book-toast', 'Requesting refund quotation from Atlas...');
+  setTimeout(function () {
+    b.status = 'Refund requested';
+    openBookingDetail(currentBookingIndex);
+    showToast('book-toast', 'Refund requested. Atlas will confirm once processed.');
+  }, 900);
+});
+
+document.getElementById('detail-share-btn').addEventListener('click', function () {
+  var b = EXISTING_BOOKINGS[currentBookingIndex];
+  var link = 'https://talktogether.app/trip/' + b.orderNo;
+  var noteEl = document.getElementById('detail-share-note');
+  function showLink(copied) {
+    noteEl.style.color = 'var(--them-dark)';
+    noteEl.textContent = (copied ? 'Link copied: ' : 'Copy this link: ') + link;
+    noteEl.style.display = 'block';
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(link).then(function () { showLink(true); }).catch(function () { showLink(false); });
+  } else {
+    showLink(false);
+  }
+});
+
+document.getElementById('detail-back').addEventListener('click', function () {
+  renderExistingBookings();
+  showBookView('book-search-view');
+});
+
+function populateBookSelects() {
+  var originSelect = document.getElementById('book-origin');
+  ORIGINS.forEach(function (o) {
+    var opt = document.createElement('option');
+    opt.value = o.code;
+    opt.textContent = o.name + ' (' + o.code + ')';
+    originSelect.appendChild(opt);
+  });
+  var destSelect = document.getElementById('book-destination');
+  DESTINATIONS.forEach(function (d) {
+    var opt = document.createElement('option');
+    opt.value = d.code;
+    opt.textContent = d.name + ' (' + d.code + ')';
+    destSelect.appendChild(opt);
+  });
+  BOOKING_ONLY_DESTINATIONS.forEach(function (d) {
+    var opt = document.createElement('option');
+    opt.value = d.code;
+    opt.textContent = d.name + ' (' + d.code + ')';
+    destSelect.appendChild(opt);
+  });
+  var dateInput = document.getElementById('book-date');
+  var defaultDate = new Date();
+  defaultDate.setDate(defaultDate.getDate() + 30);
+  dateInput.value = defaultDate.toISOString().slice(0, 10);
+  dateInput.min = new Date().toISOString().slice(0, 10);
+
+  originSelect.value = 'CJU';
+  destSelect.value = 'SEL';
+}
+populateBookSelects();
+
+function applyBookingPrefill() {
+  if (!bookingPrefill) return;
+  document.getElementById('book-destination').value = bookingPrefill.destCode;
+  bookingPrefill = null;
+}
+
+/* Maps to Atlas search.do — tries the real local proxy first, falls back to mock */
+var ATLAS_PROXY_URL = 'http://localhost:3001/api/search';
+
+function realAtlasSearch(originCode, destCode, date) {
+  var atlasDate = date.replace(/-/g, ''); // YYYY-MM-DD -> YYYYMMDD
+  return fetch(ATLAS_PROXY_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fromCity: originCode, toCity: destCode, fromDate: atlasDate })
+  }).then(function (res) {
+    if (!res.ok) throw new Error('Proxy returned ' + res.status);
+    return res.json();
+  }).then(function (data) {
+    if (!data || !data.routings || !data.routings.length) throw new Error('No real flights for this route in sandbox');
+    return data.routings.map(function (routing, i) {
+      var seg = routing.fromSegments && routing.fromSegments[0];
+      var totalPrice = (routing.adultPrice || 0) + (routing.adultTax || 0) + (routing.transactionFeePerPax || 0);
+      return {
+        id: 'REAL' + i,
+        airline: seg ? seg.carrier : 'Unknown',
+        flightNumber: seg ? seg.flightNumber : '',
+        departTime: seg && seg.depTime ? seg.depTime.slice(8, 10) + ':' + seg.depTime.slice(10, 12) : '',
+        arriveTime: seg && seg.arrTime ? seg.arrTime.slice(8, 10) + ':' + seg.arrTime.slice(10, 12) : '',
+        durationHours: seg && seg.duration ? Math.round(seg.duration / 60) : 0,
+        stops: 0,
+        price: Math.round(totalPrice * 100) / 100,
+        originCode: originCode,
+        destCode: destCode,
+        date: date,
+        isReal: true,
+        routingIdentifier: routing.routingIdentifier // needed for a real verify.do call next
+      };
+    });
+  });
+}
+
+function mockAtlasSearch(originCode, destCode, date) {
+  return realAtlasSearch(originCode, destCode, date).catch(function (err) {
+    console.warn('Real Atlas call unavailable, using mock data:', err.message);
+    return mockAtlasSearchFallback(originCode, destCode, date);
+  });
+}
+
+function mockAtlasSearchFallback(originCode, destCode, date) {
+  var airlines = ['Skyline Air', 'Pacific Wings', 'Nimbus Airlines', 'Meridian Air'];
+  var flights = [];
+  for (var i = 0; i < 4; i++) {
+    var depHour = 7 + i * 3;
+    var durationHours = 3 + Math.floor(Math.random() * 4);
+    var stops = i === 2 ? 1 : 0;
+    var price = 180 + Math.floor(Math.random() * 220);
+    flights.push({
+      id: 'FLT' + (1000 + i),
+      airline: airlines[i % airlines.length],
+      flightNumber: airlines[i % airlines.length].slice(0, 2).toUpperCase() + (100 + i * 7),
+      departTime: String(depHour).padStart(2, '0') + ':00',
+      arriveTime: String((depHour + durationHours) % 24).padStart(2, '0') + ':' + (i % 2 === 0 ? '00' : '30'),
+      durationHours: durationHours,
+      stops: stops,
+      price: price,
+      originCode: originCode,
+      destCode: destCode,
+      date: date
+    });
+  }
+  return new Promise(function (resolve) { setTimeout(function () { resolve(flights); }, 900); });
+}
+
+/* Maps to Atlas verify.do and getOfferPrice.do (Fulfilment API fast path) */
+function realAtlasVerify(routingIdentifier) {
+  return fetch(ATLAS_PROXY_URL.replace('/api/search', '/api/verify'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ routingIdentifier: routingIdentifier })
+  }).then(function (res) {
+    if (!res.ok) throw new Error('Verify proxy returned ' + res.status);
+    return res.json();
+  }).then(function (data) {
+    if (data.status !== 0) throw new Error(data.msg || 'Atlas verify.do error');
+    return data;
+  });
+}
+
+function mockAtlasVerifyAndPrice(flight) {
+  if (flight.isReal && flight.routingIdentifier) {
+    return realAtlasVerify(flight.routingIdentifier).then(function (verifyData) {
+      var routing = verifyData.routing;
+      var seg = routing.fromSegments && routing.fromSegments[0];
+      var totalPrice = (routing.adultPrice || 0) + (routing.adultTax || 0) + (routing.transactionFeePerPax || 0);
+      var updated = {};
+      for (var k in flight) { updated[k] = flight[k]; }
+      updated.sessionId = verifyData.sessionId;
+      updated.price = Math.round(totalPrice * 100) / 100;
+      updated.bookingRequirement = verifyData.bookingRequirement;
+      return updated;
+    }).catch(function (err) {
+      console.warn('Real Atlas verify unavailable, using flight as-is:', err.message);
+      return mockAtlasVerifyAndPriceFallback(flight);
+    });
+  }
+  return mockAtlasVerifyAndPriceFallback(flight);
+}
+
+function mockAtlasVerifyAndPriceFallback(flight) {
+  return new Promise(function (resolve) { setTimeout(function () { resolve(flight); }, 600); });
+}
+
+/* Maps to Atlas order.do and pay.do */
+function realAtlasOrderAndPay(sessionId, passengerInfo) {
+  var baseUrl = ATLAS_PROXY_URL.replace('/api/search', '');
+  return fetch(baseUrl + '/api/order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sessionId: sessionId,
+      travelerName: passengerInfo.name,
+      contactEmail: passengerInfo.email,
+      gender: passengerInfo.gender,
+      birthday: passengerInfo.birthday,
+      passportNumber: passengerInfo.passportNumber,
+      nationality: passengerInfo.nationality
+    })
+  }).then(function (res) {
+    if (!res.ok) throw new Error('Order proxy returned ' + res.status);
+    return res.json();
+  }).then(function (orderData) {
+    if (orderData.status !== 0) throw new Error(orderData.msg || 'Atlas order.do error');
+    return fetch(baseUrl + '/api/pay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderNo: orderData.orderNo })
+    }).then(function (res) {
+      if (!res.ok) throw new Error('Pay proxy returned ' + res.status);
+      return res.json();
+    }).then(function (payData) {
+      if (payData.status !== 0) throw new Error(payData.msg || 'Atlas pay.do error');
+      return { orderNo: orderData.orderNo, pnrCode: payData.pnrCode || orderData.pnrCode };
+    });
+  });
+}
+
+function mockAtlasCreateOrderAndPay(flight, passengerInfo) {
+  if (flight.isReal && flight.sessionId) {
+    return realAtlasOrderAndPay(flight.sessionId, passengerInfo).catch(function (err) {
+      console.warn('Real Atlas order/pay unavailable, using mock:', err.message);
+      return mockAtlasCreateOrderAndPayFallback(flight, passengerInfo.name);
+    });
+  }
+  return mockAtlasCreateOrderAndPayFallback(flight, passengerInfo.name);
+}
+
+function mockAtlasCreateOrderAndPayFallback(flight, traveler) {
+  var orderNo = 'ATL' + Math.random().toString(36).slice(2, 8).toUpperCase();
+  return new Promise(function (resolve) { setTimeout(function () { resolve({ orderNo: orderNo }); }, 1100); });
+}
+
+/* Maps to Atlas webhook notification dispatch */
+function mockAtlasNotifyFamily(orderNo) {
+  return new Promise(function (resolve) { setTimeout(function () { resolve(true); }, 300); });
+}
+
+function showBookView(viewId) {
+  ['book-search-view', 'book-loading-view', 'book-results-view', 'book-review-view', 'book-processing-view', 'book-confirm-view', 'book-detail-view'].forEach(function (id) {
+    document.getElementById(id).style.display = id === viewId ? 'block' : 'none';
+  });
+}
+
+document.getElementById('book-search-btn').addEventListener('click', function () {
+  var originCode = document.getElementById('book-origin').value;
+  var destCode = document.getElementById('book-destination').value;
+  var date = document.getElementById('book-date').value;
+  showBookView('book-loading-view');
+  document.getElementById('book-loading-text').textContent = 'Searching flights with Atlas...';
+  mockAtlasSearch(originCode, destCode, date).then(function (flights) {
+    renderFlightResults(flights, originCode, destCode, date);
+    showBookView('book-results-view');
+  });
+});
+
+function renderFlightResults(flights, originCode, destCode, date) {
+  var originName = ORIGINS.find(function (o) { return o.code === originCode; }).name;
+  var destName = findDestinationName(destCode);
+  document.getElementById('results-title').textContent = originName + ' to ' + destName;
+  document.getElementById('results-sub').textContent = date + ' - ' + flights.length + ' flights found';
+  var list = document.getElementById('flight-list');
+  list.innerHTML = '';
+  flights.forEach(function (f) {
+    var card = document.createElement('div');
+    card.className = 'card flight-card';
+    card.innerHTML =
+      '<div class="flight-info">' +
+        '<div class="airline">' + escapeHtml(f.airline) + ' ' + escapeHtml(f.flightNumber) + '</div>' +
+        '<div class="times">' + f.departTime + ' to ' + f.arriveTime + '</div>' +
+        '<div class="meta">' + f.durationHours + 'h ' + (f.stops === 0 ? 'Direct' : f.stops + ' stop') + '</div>' +
+      '</div>' +
+      '<div class="flight-price"><div class="amount">$' + f.price + '</div><div class="label">per person</div></div>';
+    card.addEventListener('click', function () { selectFlight(f); });
+    list.appendChild(card);
+  });
+}
+
+function selectFlight(flight) {
+  showBookView('book-loading-view');
+  document.getElementById('book-loading-text').textContent = 'Verifying fare with Atlas...';
+  mockAtlasVerifyAndPrice(flight).then(function (verifiedFlight) {
+    selectedFlight = verifiedFlight;
+    renderReview();
+    showBookView('book-review-view');
+  });
+}
+
+function renderReview() {
+  var f = selectedFlight;
+  var destName = findDestinationName(f.destCode);
+  document.getElementById('review-flight-card').innerHTML =
+    '<div class="airline">' + escapeHtml(f.airline) + ' ' + escapeHtml(f.flightNumber) + '</div>' +
+    '<div class="times">' + f.departTime + ' to ' + f.arriveTime + ', ' + f.date + '</div>' +
+    '<div class="meta">To ' + escapeHtml(destName) + ', ' + f.durationHours + 'h ' + (f.stops === 0 ? 'direct' : f.stops + ' stop') + '</div>';
+  document.getElementById('real-passenger-fields').style.display = f.isReal ? 'block' : 'none';
+  updateReviewSummary();
+}
+
+function updateReviewSummary() {
+  var f = selectedFlight;
+  var baggage = document.getElementById('review-baggage').checked;
+  var total = f.price + (baggage ? 25 : 0);
+  document.getElementById('review-summary-card').innerHTML =
+    '<div class="review-row"><span class="row-label">Fare</span><span>$' + f.price + '</span></div>' +
+    (baggage ? '<div class="review-row"><span class="row-label">Checked baggage</span><span>$25</span></div>' : '') +
+    '<div class="review-row"><span class="row-label">Total</span><span style="font-weight:700;">$' + total + '</span></div>';
+}
+document.getElementById('review-baggage').addEventListener('change', updateReviewSummary);
+
+document.getElementById('review-confirm-btn').addEventListener('click', function () {
+  var name = document.getElementById('review-name').value.trim();
+  if (!name) {
+    showBookErrorInline('Enter the traveler name to continue.');
+    return;
+  }
+  var passengerInfo = { name: name };
+  if (selectedFlight.isReal) {
+    var birthdayRaw = document.getElementById('review-birthday').value;
+    if (!birthdayRaw) {
+      showBookErrorInline('Enter a date of birth to continue. Atlas requires this for a real booking.');
+      return;
+    }
+    passengerInfo.gender = document.getElementById('review-gender').value;
+    passengerInfo.birthday = birthdayRaw.replace(/-/g, '');
+    passengerInfo.email = document.getElementById('review-email').value.trim();
+    passengerInfo.passportNumber = document.getElementById('review-passport').value.trim();
+    passengerInfo.nationality = document.getElementById('review-nationality').value.trim();
+  }
+  var notify = document.getElementById('review-notify').checked;
+  var seatPref = document.getElementById('review-seat').value;
+  var hasBaggage = document.getElementById('review-baggage').checked;
+  showBookView('book-processing-view');
+  document.getElementById('book-processing-text').textContent = selectedFlight.isReal
+    ? 'Placing your real order with Atlas...'
+    : 'Placing your order with Atlas...';
+  mockAtlasCreateOrderAndPay(selectedFlight, passengerInfo).then(function (result) {
+    document.getElementById('book-processing-text').textContent = 'Confirming payment...';
+    if (notify) {
+      return mockAtlasNotifyFamily(result.orderNo).then(function () { return result; });
+    }
+    return result;
+  }).then(function (result) {
+    var f = selectedFlight;
+    var originName = ORIGINS.find(function (o) { return o.code === f.originCode; }).name;
+    var destName = findDestinationName(f.destCode);
+    EXISTING_BOOKINGS.unshift({
+      orderNo: result.orderNo, pnrCode: result.pnrCode || null, originCode: f.originCode, originName: originName, destCode: f.destCode, destName: destName,
+      date: f.date, departTime: f.departTime, arriveTime: f.arriveTime, airline: f.airline, flightNumber: f.flightNumber,
+      status: 'Ticketed', seatPref: seatPref, hasBaggage: hasBaggage
+    });
+    document.getElementById('confirm-code').textContent = result.pnrCode ? result.pnrCode : result.orderNo;
+    document.getElementById('confirm-notify-line').textContent = notify ? 'Your family has been notified of this booking.' : '';
+    showBookView('book-confirm-view');
+  });
+});
+
+function showBookErrorInline(message) {
+  var existing = document.getElementById('book-inline-error');
+  if (existing) existing.remove();
+  var banner = document.createElement('p');
+  banner.id = 'book-inline-error';
+  banner.className = 'atlas-note';
+  banner.style.color = 'var(--danger)';
+  banner.textContent = message;
+  document.getElementById('review-confirm-btn').insertAdjacentElement('afterend', banner);
+}
+
+document.getElementById('results-back').addEventListener('click', function () { showBookView('book-search-view'); });
+document.getElementById('review-back').addEventListener('click', function () { showBookView('book-results-view'); });
+document.getElementById('confirm-done-btn').addEventListener('click', function () {
+  renderExistingBookings();
+  showBookView('book-search-view');
+  switchTab('tab-plan');
+});
+
+/* =============================================================
+   TAB 3: TRACK — live location map + family chat + SOS
+   ============================================================= */
+var trackMapInitialized = false;
+
+function renderTrackMap(frameId, lat, lon) {
+  var delta = 0.01;
+  var bbox = (lon - delta) + ',' + (lat - delta) + ',' + (lon + delta) + ',' + (lat + delta);
+  document.getElementById(frameId).src =
+    'https://www.openstreetmap.org/export/embed.html?bbox=' + bbox + '&layer=mapnik&marker=' + lat + ',' + lon;
+}
+
+function initTrackMap() {
+  if (trackMapInitialized) return;
+  trackMapInitialized = true;
+  var statusEl = document.getElementById('location-status');
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      renderTrackMap('track-map-frame', pos.coords.latitude, pos.coords.longitude);
+      statusEl.textContent = 'Sharing live location';
+    }, function () {
+      renderTrackMap('track-map-frame', 1.3521, 103.8198);
+      statusEl.textContent = 'Sharing location (demo position)';
+    }, { timeout: 6000 });
+  } else {
+    renderTrackMap('track-map-frame', 1.3521, 103.8198);
+    statusEl.textContent = 'Sharing location (demo position)';
+  }
+}
+
+var FAMILY_MESSAGES = [
+  { sender: 'Serene (Daughter)', who: 'family', text: 'Pa, remember to drink water ok! Weather very hot today.', time: '10:02 AM' },
+  { sender: 'You', who: 'me', text: 'Yes yes I know already, now at the temple with your mother.', time: '10:05 AM' },
+  { sender: 'Kevin (Son)', who: 'family', text: 'Wah nice, send us a photo when free!', time: '10:06 AM' },
+  { sender: 'You', who: 'me', text: 'Here you go! Beautiful right', time: '10:08 AM', photoUrl: 'https://images.unsplash.com/photo-1714214800596-1f98c5dee4bd?auto=format&fit=crop&w=600&q=70' },
+  { sender: 'Care Companion - Lily', who: 'admin', text: 'Just checking in, everything looks good on our end.', time: '10:10 AM' }
+];
+
+function nowTimeString() {
+  var d = new Date();
+  var h = d.getHours();
+  var m = d.getMinutes();
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  var h12 = h % 12;
+  if (h12 === 0) h12 = 12;
+  var mm = m < 10 ? '0' + m : '' + m;
+  return h12 + ':' + mm + ' ' + ampm;
+}
+
+function renderChat() {
+  var list = document.getElementById('chat-list');
+  list.innerHTML = FAMILY_MESSAGES.map(function (m) {
+    if (m.who === 'system') {
+      return '<div class="chat-msg system">' + escapeHtml(m.text) + '</div>';
+    }
+    var senderLine = m.who === 'me' ? '' :
+      '<div class="chat-sender">' + escapeHtml(m.sender) + (m.who === 'admin' ? ' <span class="admin-tag">Admin</span>' : '') + '</div>';
+    var bubbleClass = m.photoUrl ? 'chat-bubble has-photo' : 'chat-bubble';
+    var bubbleInner = (m.photoUrl ? '<img class="chat-photo" src="' + m.photoUrl + '" alt="Shared photo">' : '') +
+      (m.text ? '<div class="' + (m.photoUrl ? 'chat-photo-caption' : '') + '">' + escapeHtml(m.text) + '</div>' : '');
+    return '<div class="chat-msg ' + m.who + '">' +
+      senderLine +
+      '<div class="' + bubbleClass + '">' + bubbleInner + '</div>' +
+      '<div class="chat-time">' + escapeHtml(m.time) + '</div>' +
+      '</div>';
+  }).join('');
+  list.scrollTop = list.scrollHeight;
+}
+renderChat();
+
+function sendChatMessage() {
+  var input = document.getElementById('chat-input');
+  var text = input.value.trim();
+  if (!text) return;
+  FAMILY_MESSAGES.push({ sender: 'You', who: 'me', text: text, time: nowTimeString() });
+  input.value = '';
+  renderChat();
+}
+document.getElementById('chat-send-btn').addEventListener('click', sendChatMessage);
+document.getElementById('chat-input').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') sendChatMessage();
+});
+
+function triggerSOS(target) {
+  var isFamily = target === 'family';
+  showToast('track-banner', isFamily ? 'Alerting family members...' : 'Alerting the care admin...');
+  FAMILY_MESSAGES.push({
+    who: 'system',
+    text: isFamily ? 'SOS sent to family members. They have been notified immediately.' : 'SOS sent to the care admin. Help is on the way.',
+    time: nowTimeString()
+  });
+  renderChat();
+}
+document.getElementById('sos-family-btn').addEventListener('click', function () { triggerSOS('family'); });
+document.getElementById('sos-admin-btn').addEventListener('click', function () { triggerSOS('admin'); });
+
+/* =============================================================
+   TAB 4: GO — hub with Navigate and Translate
+   ============================================================= */
+function showGoView(viewId) {
+  ['go-hub', 'go-navigate', 'go-translate'].forEach(function (id) {
+    document.getElementById(id).classList.toggle('visible', id === viewId);
+  });
+}
+document.getElementById('go-open-navigate').addEventListener('click', function () {
+  showGoView('go-navigate');
+  renderTrackMap('navigate-map-frame', 1.3521, 103.8198);
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      renderTrackMap('navigate-map-frame', pos.coords.latitude, pos.coords.longitude);
+    }, function () {}, { timeout: 6000 });
+  }
+});
+document.getElementById('go-open-translate').addEventListener('click', function () { showGoView('go-translate'); });
+document.getElementById('navigate-back').addEventListener('click', function () { showGoView('go-hub'); });
+document.getElementById('translate-back').addEventListener('click', function () { showGoView('go-hub'); });
+
+/* Route/mode estimates map to a real directions API in production (e.g. Amap direction API) */
+var currentNavModes = null;
+
+document.getElementById('nav-get-directions-btn').addEventListener('click', function () {
+  var destination = document.getElementById('nav-destination').value.trim();
+  if (!destination) return;
+  var walkMin = 25 + Math.floor(Math.random() * 30);
+  var walkKm = (walkMin / 14).toFixed(1);
+  var transitMin = 12 + Math.floor(Math.random() * 15);
+  var transfers = Math.floor(Math.random() * 2);
+  var cabMin = 5 + Math.floor(Math.random() * 8);
+  var cabPrice = (8 + Math.random() * 8).toFixed(2);
+  currentNavModes = {
+    walk: { time: walkMin + ' min', meta: walkKm + ' km' },
+    transit: { time: transitMin + ' min', meta: transfers === 0 ? 'Direct route' : transfers + ' transfer' + (transfers > 1 ? 's' : '') },
+    cab: { time: cabMin + ' min', meta: '$' + cabPrice + ' estimated', price: cabPrice }
+  };
+  currentNavModes.destination = destination;
+  document.getElementById('nav-modes-section').style.display = 'block';
+  document.querySelectorAll('#nav-mode-segmented button').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-mode') === 'walk'); });
+  setNavMode('walk');
+  document.getElementById('quick-ride-price').textContent = 'Estimated $' + cabPrice + ' \u00b7 ' + cabMin + ' min away';
+});
+
+function setNavMode(modeKey) {
+  var m = currentNavModes[modeKey];
+  document.getElementById('nav-mode-detail').innerHTML =
+    '<div class="nav-mode-detail-title">' + m.time + '</div>' +
+    '<div class="tagline">' + escapeHtml(m.meta) + ' to ' + escapeHtml(currentNavModes.destination) + '</div>';
+}
+document.querySelectorAll('#nav-mode-segmented button').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    document.querySelectorAll('#nav-mode-segmented button').forEach(function (b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    setNavMode(btn.getAttribute('data-mode'));
+  });
+});
+
+/* Maps to a real ride-hailing aggregator (e.g. Amap's ride-hailing marketplace) in production */
+function mockRideBook(ride) {
+  var plate = 'S' + Math.floor(1000 + Math.random() * 9000) + String.fromCharCode(65 + Math.floor(Math.random() * 26));
+  var minutes = Math.floor(Math.random() * 5) + 2;
+  return new Promise(function (resolve) { setTimeout(function () { resolve({ plate: plate, minutes: minutes }); }, 800); });
+}
+
+function bookRide(ride, destination) {
+  var resultsEl = document.getElementById('ride-results');
+  resultsEl.innerHTML = '<p class="loading-line">Booking your ' + escapeHtml(ride.name) + '...</p>';
+  mockRideBook(ride).then(function (result) {
+    resultsEl.innerHTML =
+      '<div class="card confirm-hero">' +
+        '<div class="confirm-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+        '<h1>Ride booked!</h1>' +
+        '<p class="tagline">' + escapeHtml(ride.name) + ' to ' + escapeHtml(destination) + '</p>' +
+        '<div class="confirm-code">' + escapeHtml(result.plate) + '</div>' +
+        '<p class="tagline">Arriving in about ' + result.minutes + ' minutes</p>' +
+      '</div>';
+  });
+}
+
+document.getElementById('quick-ride-btn').addEventListener('click', function () {
+  if (!currentNavModes) {
+    document.getElementById('quick-ride-price').textContent = 'Enter a destination and tap Get directions first.';
+    return;
+  }
+  bookRide({ name: 'Cab', price: currentNavModes.cab.price }, currentNavModes.destination);
+});
+
+/* =============================================================
+   TRANSLATE — voice translator (nested inside Go tab)
+   ============================================================= */
+var LANGUAGES = [
+  { code: 'en-US', name: 'English' },
+  { code: 'zh-CN', name: 'Mandarin Chinese' },
+  { code: 'ms-MY', name: 'Malay' },
+  { code: 'ta-IN', name: 'Tamil' },
+  { code: 'hi-IN', name: 'Hindi' },
+  { code: 'ja-JP', name: 'Japanese' },
+  { code: 'ko-KR', name: 'Korean' },
+  { code: 'th-TH', name: 'Thai' },
+  { code: 'vi-VN', name: 'Vietnamese' },
+  { code: 'id-ID', name: 'Indonesian' },
+  { code: 'es-ES', name: 'Spanish' },
+  { code: 'fr-FR', name: 'French' },
+  { code: 'de-DE', name: 'German' },
+  { code: 'pt-PT', name: 'Portuguese' },
+  { code: 'ar-SA', name: 'Arabic' }
+];
+
+var langYouSelect = document.getElementById('lang-you');
+var langThemSelect = document.getElementById('lang-them');
+var readAloudToggle = document.getElementById('read-aloud-toggle');
+
+function populateSelect(select, defaultCode) {
+  LANGUAGES.forEach(function (lang) {
+    var opt = document.createElement('option');
+    opt.value = lang.code;
+    opt.textContent = lang.name;
+    if (lang.code === defaultCode) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+populateSelect(langYouSelect, 'en-US');
+populateSelect(langThemSelect, 'zh-CN');
+
+function langName(code) {
+  var found = LANGUAGES.find(function (l) { return l.code === code; });
+  return found ? found.name : code;
+}
+
+document.getElementById('swap-btn').addEventListener('click', function () {
+  var a = langYouSelect.value;
+  langYouSelect.value = langThemSelect.value;
+  langThemSelect.value = a;
+});
+
+function showError(message) {
+  var banner = document.getElementById('error-banner');
+  banner.textContent = message;
+  banner.classList.add('show');
+  setTimeout(function () { banner.classList.remove('show'); }, 5000);
+}
+
+function setStage(mode, status, html) {
+  var stage = document.getElementById('stage');
+  stage.classList.remove('mode-them', 'mode-you');
+  if (mode) stage.classList.add('mode-' + mode);
+  document.getElementById('stage-status').textContent = status;
+  document.getElementById('stage-text').innerHTML = html;
+}
+
+function addHistoryItem(who, fromLang, toLang, originalText, translatedText) {
+  var list = document.getElementById('history-list');
+  var empty = list.querySelector('.empty-history');
+  if (empty) empty.remove();
+  var li = document.createElement('li');
+  li.className = 'history-item tag-' + who;
+  var tagLabel = who === 'you' ? 'You' : 'Them';
+  li.innerHTML =
+    '<span class="tag">' + tagLabel + '</span>' +
+    '<div class="line">' + escapeHtml(translatedText) + '</div>' +
+    '<div class="line muted">' + langName(fromLang) + ': ' + escapeHtml(originalText) + '</div>';
+  list.prepend(li);
+}
+
+function translateText(text, fromLangCode, toLangCode) {
+  if (!text || !text.trim()) {
+    return Promise.reject(new Error('Cannot translate empty text'));
+  }
+  var langpair = fromLangCode.split('-')[0] + '|' + toLangCode.split('-')[0];
+  var url = 'https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text) + '&langpair=' + langpair;
+  return fetch(url).then(function (response) {
+    if (!response.ok) throw new Error('Translation request failed');
+    return response.json();
+  }).then(function (data) {
+    if (!data || !data.responseData || !data.responseData.translatedText) throw new Error('No translation returned');
+    var result = data.responseData.translatedText;
+    if (result.toUpperCase().indexOf('NO QUERY SPECIFIED') !== -1 || result.toUpperCase().indexOf('QUERY LENGTH LIMIT') !== -1) {
+      throw new Error('Translation service rejected the request');
+    }
+    return result;
+  });
+}
+
+function speak(text, langCode) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  var utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = langCode;
+  var voices = window.speechSynthesis.getVoices();
+  var match = voices.find(function (v) { return v.lang === langCode; }) ||
+              voices.find(function (v) { return v.lang.indexOf(langCode.split('-')[0]) === 0; });
+  if (match) utterance.voice = match;
+  window.speechSynthesis.speak(utterance);
+}
+
+function getRecognition() {
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return null;
+  return new SpeechRecognition();
+}
+
+var listenRecognition = null;
+var listenActive = false;
+var listenSuppressRestart = false;
+
+function startAmbientListening() {
+  var recognition = getRecognition();
+  if (!recognition) {
+    showError('Speech recognition is not supported in this browser. Try Chrome or Edge.');
+    listenActive = false;
+    setListenUI(false);
+    return;
+  }
+  listenRecognition = recognition;
+  var sourceLangCode = langThemSelect.value;
+  var targetLangCode = langYouSelect.value;
+  recognition.lang = sourceLangCode;
+  recognition.continuous = true;
+  recognition.interimResults = true;
+
+  recognition.onstart = function () {
+    setStage('them', 'Listening around you', '<span class="stage-placeholder">Waiting for speech in ' + langName(sourceLangCode) + '</span>');
+  };
+  recognition.onresult = function (event) {
+    for (var i = event.resultIndex; i < event.results.length; i++) {
+      var result = event.results[i];
+      var transcript = result[0].transcript;
+      if (result.isFinal) {
+        (function (heardText) {
+          if (!heardText || !heardText.trim()) {
+            setStage('them', 'Listening around you', '<span class="stage-placeholder">Waiting for speech in ' + langName(sourceLangCode) + '</span>');
+            return;
+          }
+          setStage('them', 'Translating', escapeHtml(heardText));
+          translateText(heardText, sourceLangCode, targetLangCode).then(function (translated) {
+            setStage('them', 'Heard just now', escapeHtml(translated) + '<span class="original">' + escapeHtml(heardText) + '</span>');
+            addHistoryItem('them', sourceLangCode, targetLangCode, heardText, translated);
+            if (readAloudToggle.checked) speak(translated, targetLangCode);
+          }).catch(function () { showError('Translation failed. Still listening.'); });
+        })(transcript);
+      } else {
+        setStage('them', 'Listening around you', '<span class="stage-placeholder">' + escapeHtml(transcript) + '</span>');
+      }
+    }
+  };
+  recognition.onerror = function (event) {
+    if (event.error === 'not-allowed') {
+      showError('Microphone access was blocked. Allow microphone access and try again.');
+      listenActive = false;
+      setListenUI(false);
+    }
+  };
+  recognition.onend = function () {
+    if (listenSuppressRestart) { listenSuppressRestart = false; return; }
+    if (listenActive) setTimeout(function () { if (listenActive) startAmbientListening(); }, 300);
+  };
+  try { recognition.start(); } catch (err) { showError('Could not start the microphone. Please try again.'); }
+}
+
+function setListenUI(active) {
+  var btn = document.getElementById('listen-btn');
+  var label = document.getElementById('listen-label');
+  var speakBtn = document.getElementById('speak-btn');
+  btn.classList.toggle('active', active);
+  label.textContent = active ? 'Stop conversation' : 'Start conversation';
+  speakBtn.disabled = active;
+  if (!active) setStage(null, 'Ready', '<span class="stage-placeholder">Tap a button above to begin.</span>');
+}
+
+document.getElementById('listen-btn').addEventListener('click', function () {
+  if (speakActive) return;
+  if (!listenActive) { listenActive = true; setListenUI(true); startAmbientListening(); }
+  else {
+    listenActive = false;
+    setListenUI(false);
+    if (listenRecognition) { listenSuppressRestart = true; try { listenRecognition.stop(); } catch (err) {} }
+  }
+});
+
+var speakRecognition = null;
+var speakActive = false;
+var speakFinalTranscript = '';
+
+function setSpeakUI(active) {
+  var btn = document.getElementById('speak-btn');
+  var label = document.getElementById('speak-label');
+  var listenBtn = document.getElementById('listen-btn');
+  btn.classList.toggle('active', active);
+  label.textContent = active ? 'Tap to stop' : 'Speak';
+  listenBtn.disabled = active;
+}
+
+document.getElementById('speak-btn').addEventListener('click', function () {
+  if (listenActive) return;
+  if (!speakActive) {
+    var recognition = getRecognition();
+    if (!recognition) { showError('Speech recognition is not supported in this browser. Try Chrome or Edge.'); return; }
+    speakRecognition = recognition;
+    speakFinalTranscript = '';
+    var sourceLangCode = langYouSelect.value;
+    recognition.lang = sourceLangCode;
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onstart = function () {
+      speakActive = true;
+      setSpeakUI(true);
+      setStage('you', 'Recording your voice', '<span class="stage-placeholder">Speak now in ' + langName(sourceLangCode) + '. Tap Speak again when done.</span>');
+    };
+    recognition.onresult = function (event) {
+      var interim = '';
+      for (var i = event.resultIndex; i < event.results.length; i++) {
+        var transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) speakFinalTranscript += transcript + ' ';
+        else interim += transcript;
+      }
+      setStage('you', 'Recording your voice', escapeHtml(speakFinalTranscript + interim));
+    };
+    recognition.onerror = function (event) {
+      if (event.error === 'not-allowed') {
+        showError('Microphone access was blocked. Allow microphone access and try again.');
+        speakActive = false;
+        setSpeakUI(false);
+        setStage(null, 'Ready', '<span class="stage-placeholder">Tap a button above to begin.</span>');
+      }
+    };
+    recognition.onend = function () {
+      speakActive = false;
+      setSpeakUI(false);
+      var heard = speakFinalTranscript.trim();
+      if (!heard) {
+        setStage(null, 'Ready', '<span class="stage-placeholder">No speech detected. Tap Speak and try again.</span>');
+        return;
+      }
+      var targetLangCode = langThemSelect.value;
+      setStage('you', 'Translating', escapeHtml(heard));
+      translateText(heard, sourceLangCode, targetLangCode).then(function (translated) {
+        setStage('you', 'Playing translation', escapeHtml(translated) + '<span class="original">' + escapeHtml(heard) + '</span>');
+        if (readAloudToggle.checked) speak(translated, targetLangCode);
+        addHistoryItem('you', sourceLangCode, targetLangCode, heard, translated);
+      }).catch(function () {
+        showError('Translation failed. Please try again.');
+        setStage(null, 'Ready', '<span class="stage-placeholder">Tap a button above to begin.</span>');
+      });
+    };
+    try { recognition.start(); } catch (err) { showError('Could not start the microphone. Please try again.'); }
+  } else {
+    if (speakRecognition) { try { speakRecognition.stop(); } catch (err) {} }
+  }
+});
+
+if ('speechSynthesis' in window) { window.speechSynthesis.onvoiceschanged = function () {}; }
+</script>
+</body>
+</html>
